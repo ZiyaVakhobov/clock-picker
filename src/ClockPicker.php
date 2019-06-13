@@ -16,7 +16,7 @@ class ClockPicker extends Widget
     public $value;
     public $model;
     public $attribute;
-    public $options;
+    public $options=[];
 
     public function init()
     {
@@ -60,9 +60,9 @@ class ClockPicker extends Widget
     public function input()
     {
         if ($this->model !== null) {
-            return Html::activeTextInput($this->model,$this->attribute,$this->options);
+            return Html::activeTextInput($this->model,$this->attribute,['class'=>'form-control']);
         }
-        return Html::textInput($this->name,$this->value,$this->options);
+        return Html::textInput($this->name,$this->value,['class'=>'form-control']);
     }
 
     /**
@@ -83,7 +83,8 @@ class ClockPicker extends Widget
                     ['class'=>'glyphicon glyphicon-time']
                 ),
                 ['class'=>'input-group-addon']
-            )
+            ),
+            ['class'=>'input-group clockpicker']
         );
     }
 }
