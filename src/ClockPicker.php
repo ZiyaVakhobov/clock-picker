@@ -7,6 +7,7 @@ namespace ziya\ClockPicker;
 use yii\base\Exception;
 use yii\base\Widget;
 use yii\helpers\Html;
+use yii\helpers\Json;
 use yii\web\JsExpression;
 use yii\web\View;
 
@@ -15,6 +16,7 @@ class ClockPicker extends Widget
     public $bootstrap = true;
     public $name;
     public $value;
+    public $visible = true;
     public $model;
     public $attribute;
     public $options = [];
@@ -26,8 +28,15 @@ class ClockPicker extends Widget
     public $doneText = 'Done';
     public $autoClose = false;
     public $vibrate = true;
+    public $addon = [];
+    public $addonWrapperClass = 'input-group-addon';
+    private const ADDON = [
+        'tag'=>'span',
+        'content'=>'',
+        'options'=>['class' => 'glyphicon glyphicon-time']
+    ];
 
-    public const EVENTS = [
+    private const EVENTS = [
         'init' => '',
         'beforeShow' => '',
         'afterShow' => '',
@@ -48,6 +57,14 @@ class ClockPicker extends Widget
             self::EVENTS,
             $this->pluginOptions
         );
+        if ($this->addon !== false) {
+            $this->addon = array_merge(
+                self::ADDON,
+                $this->addon
+            );
+        }
+        $this->options = array_merge(['class' => 'form-control', 'type'=>'time'],$this->options);
+
         if ($this->bootstrap) {
             $view = $this->getView();
             ClockPickerBootstrapAssets::register($view);
@@ -88,9 +105,9 @@ class ClockPicker extends Widget
     public function input(): string
     {
         if ($this->model !== null) {
-            return Html::activeTextInput($this->model, $this->attribute, ['class' => 'form-control']);
+            return Html::activeTextInput($this->model, $this->attribute, $this->options);
         }
-        return Html::textInput($this->name, $this->value, ['class' => 'form-control']);
+        return Html::textInput($this->name, $this->value, $this->options);
     }
 
     /**
@@ -98,20 +115,27 @@ class ClockPicker extends Widget
      */
     public function run(): string
     {
+        if (!$this->visible) {
+            return '';
+        }
         $this->getView()->registerJs('
-         $(".clockpicker").clockpicker(' . new JsExpression(json_encode($this->jsOptions)) . ');
+         $(".clockpicker").clockpicker(' . new JsExpression(Json::encode($this->jsOptions)) . ');
         ', View::POS_END);
-        return Html::tag('div',
-            $this->input()
-            . Html::tag(
+        $addonWrapper = '';
+        if ($this->addon !==false) {
+            $addonWrapper= Html::tag(
                 'span',
                 Html::tag(
-                    'span',
-                    '',
-                    ['class' => 'glyphicon glyphicon-time']
+                    $this->addon['tag'],
+                    $this->addon['content'],
+                    $this->addon['options']
                 ),
-                ['class' => 'input-group-addon']
-            ),
+                ['class' => $this->addonWrapperClass]
+            );
+        }
+        return Html::tag('div',
+            $this->input()
+            . $addonWrapper,
             ['class' => 'input-group clockpicker']
         );
     }
@@ -126,15 +150,15 @@ class ClockPicker extends Widget
             'autoclose' => $this->autoClose,
             'vibrate' => $this->vibrate,
             'fromnow' => $this->fromNow,
-            'init' => "function(){{$this->pluginOptions['init']}}",
-            'beforeShow' => "function(){{$this->pluginOptions['beforeShow']}}",
-            'afterShow' => "function(){{$this->pluginOptions['afterShow']}}",
-            'beforeHide' => "function(){{$this->pluginOptions['beforeHide']}}",
-            'afterHide' => "function(){{$this->pluginOptions['afterHide']}}",
-            'beforeHourSelect' => "function(){{$this->pluginOptions['beforeHourSelect']}}",
-            'afterHourSelect' => "function(){{$this->pluginOptions['afterHourSelect']}}",
-            'beforeDone' => "function(){{$this->pluginOptions['beforeDone']}}",
-            'afterDone' => "function(){{$this->pluginOptions['afterDone']}}"
+            'init' => new JsExpression("function(){{$this->pluginOptions['init']}}"),
+            'beforeShow' => new JsExpression("function(){{$this->pluginOptions['beforeShow']}}"),
+            'afterShow' => new JsExpression("function(){{$this->pluginOptions['afterShow']}}"),
+            'beforeHide' => new JsExpression("function(){{$this->pluginOptions['beforeHide']}}"),
+            'afterHide' => new JsExpression("function(){{$this->pluginOptions['afterHide']}}"),
+            'beforeHourSelect' => new JsExpression("function(){{$this->pluginOptions['beforeHourSelect']}}"),
+            'afterHourSelect' => new JsExpression("function(){{$this->pluginOptions['afterHourSelect']}}"),
+            'beforeDone' => new JsExpression("function(){{$this->pluginOptions['beforeDone']}}"),
+            'afterDone' => new JsExpression("function(){{$this->pluginOptions['afterDone']}}")
         ];
     }
 }
