@@ -3,7 +3,9 @@ Yii2 Clock Picker
 ```
 composer require ziya/clock-picker
 ```
-###Use with Active Form
+
+###  Use with Active Form
+
 ```
 <?= $form->field($model,'time')->widget(ClockPicker::class,[
     'bootstrap' => false, // with bootstrap assets if true or just jquery is false
