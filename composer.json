@@ -1,6 +1,6 @@
 {
     "name": "ziya/clock-picker",
-    "description": "Package for lazy loading images.",
+    "description": "Package for time picker.",
     "type": "library",
     "require": {
         "yiisoft/yii2": "~2.0"
