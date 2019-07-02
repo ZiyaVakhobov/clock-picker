@@ -1,7 +1,7 @@
 # clock-picker
 Yii2 Clock Picker
 ```
-composer require ziya/clock-picker
+composer require ziya/clock-picker "^0.1"
 ```
 
 ###  Use with Active Form
